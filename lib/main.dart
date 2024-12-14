@@ -1,11 +1,11 @@
-import 'package:chat/services/http_service.dart';
+import 'package:chat/cubits/auth/auth_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'screens/welcome/welcome_screen.dart';
 import 'theme.dart';
 
 void main() {
-  HttpService().request("/v1/user/test", method: HTTP_METHOD.get);
   runApp(const MyApp());
 }
 
@@ -14,13 +14,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'The Flutter Way',
-      debugShowCheckedModeBanner: false,
-      theme: lightThemeData(context),
-      darkTheme: darkThemeData(context),
-      themeMode: ThemeMode.light,
-      home: const WelcomeScreen(),
+    return BlocProvider(
+      create: (context) => AuthCubit(),
+      child: MaterialApp(
+        title: 'The Flutter Way',
+        debugShowCheckedModeBanner: false,
+        theme: lightThemeData(context),
+        darkTheme: darkThemeData(context),
+        themeMode: ThemeMode.light,
+        home: const WelcomeScreen(),
+      ),
     );
   }
 }
