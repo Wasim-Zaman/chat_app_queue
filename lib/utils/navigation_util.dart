@@ -1,62 +1,108 @@
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 class NavigationUtil {
-  static void navigateTo(BuildContext context, Widget screen,
-      {bool replace = false}) {
-    if (replace) {
-      Navigator.pushReplacement(
+  /// Navigate to a new screen
+  static Future<T?> navigateTo<T>(
+    BuildContext context,
+    Widget screen, {
+    PageTransitionType transitionType = PageTransitionType.rightToLeft,
+    Duration duration = const Duration(milliseconds: 300),
+    bool replace = false,
+    bool clearStack = false,
+  }) async {
+    if (clearStack) {
+      return await Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (context) => screen,
+        PageTransition(
+          type: transitionType,
+          duration: duration,
+          child: screen,
         ),
+        (route) => false,
       );
-    } else {
-      Navigator.push(
+    }
+
+    if (replace) {
+      return await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => screen,
+        PageTransition(
+          type: transitionType,
+          duration: duration,
+          child: screen,
         ),
       );
     }
-  }
 
-  static void navigateToNamed(BuildContext context, String routeName,
-      {Object? arguments}) {
-    Navigator.pushNamed(context, routeName, arguments: arguments);
-  }
-
-  static void navigateAndRemoveUntil(BuildContext context, Widget screen) {
-    Navigator.pushAndRemoveUntil(
+    return await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => screen,
+      PageTransition(
+        type: transitionType,
+        duration: duration,
+        child: screen,
       ),
-      (route) => false,
     );
   }
 
-  static void pop(BuildContext context, [dynamic result]) {
+  /// Navigate to a named route
+  static Future<T?> navigateToNamed<T>(
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+    bool replace = false,
+    bool clearStack = false,
+  }) async {
+    if (clearStack) {
+      return await Navigator.pushNamedAndRemoveUntil(
+        context,
+        routeName,
+        (route) => false,
+        arguments: arguments,
+      );
+    }
+
+    if (replace) {
+      return await Navigator.pushReplacementNamed(
+        context,
+        routeName,
+        arguments: arguments,
+      );
+    }
+
+    return await Navigator.pushNamed(
+      context,
+      routeName,
+      arguments: arguments,
+    );
+  }
+
+  /// Pop the current screen
+  static void pop<T>(BuildContext context, [T? result]) {
     Navigator.pop(context, result);
   }
 
+  /// Pop until a specific route name
   static void popUntil(BuildContext context, String routeName) {
     Navigator.popUntil(context, ModalRoute.withName(routeName));
   }
 
-  // Custom page transition
-  static PageRouteBuilder customPageRoute(Widget screen) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => screen,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-      transitionDuration: const Duration(milliseconds: 300),
-    );
+  /// Check if can pop
+  static bool canPop(BuildContext context) {
+    return Navigator.canPop(context);
+  }
+
+  /// Pop the current screen if can pop
+  static void maybePop<T>(BuildContext context, [T? result]) {
+    Navigator.maybePop(context, result);
+  }
+
+  /// Get the current route name
+  static String? getCurrentRoute(BuildContext context) {
+    String? currentRoute;
+    Navigator.popUntil(context, (route) {
+      currentRoute = route.settings.name;
+      return true;
+    });
+    return currentRoute;
   }
 }

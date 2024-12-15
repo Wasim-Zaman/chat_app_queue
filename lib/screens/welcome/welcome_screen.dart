@@ -1,5 +1,6 @@
 import 'package:chat/utils/navigation_util.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../constants.dart';
 import '../auth/signin_or_signup_screen.dart';
@@ -42,6 +43,7 @@ class WelcomeScreen extends StatelessWidget {
                   onPressed: () => NavigationUtil.navigateTo(
                         context,
                         const SigninOrSignupScreen(),
+                        transitionType: PageTransitionType.rightToLeft,
                       ),
                   child: Row(
                     children: [

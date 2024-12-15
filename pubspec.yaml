@@ -35,6 +35,8 @@ dependencies:
   # Draw SVG files
   flutter_svg: ^2.0.10
   flutter_bloc: ^8.1.6
+  page_transition: ^2.1.0
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

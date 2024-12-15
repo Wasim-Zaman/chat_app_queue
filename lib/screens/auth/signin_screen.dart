@@ -1,5 +1,6 @@
 import 'package:chat/utils/navigation_util.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../components/primary_button.dart';
 import '../../constants.dart';
@@ -75,6 +76,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       NavigationUtil.navigateTo(
                         context,
                         const ChatsScreen(),
+                        transitionType: PageTransitionType.rightToLeft,
+                        clearStack: true,
                       );
                     }
                   },
