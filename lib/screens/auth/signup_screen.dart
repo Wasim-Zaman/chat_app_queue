@@ -1,19 +1,22 @@
+import 'package:chat/components/custom_text_form_field.dart';
+import 'package:chat/providers/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../../components/primary_button.dart';
 import '../../constants.dart';
 import '../../utils/navigation_util.dart';
-import '../chats/chats_screen.dart';
+import 'signin_screen.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -21,6 +24,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to state changes
+    ref.listen(authProvider, (previous, next) {
+      if (next is AuthSuccess) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.response.message),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Navigate to login screen
+        NavigationUtil.navigateTo(
+          context,
+          const SignInScreen(),
+          transitionType: PageTransitionType.rightToLeft,
+          clearStack: true,
+        );
+      } else if (next is AuthError) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    });
+
+    // Watch the current state
+    final state = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sign Up"),
@@ -34,15 +68,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               children: [
                 const Spacer(),
-                TextFormField(
+                CustomTextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(
-                    hintText: "Choose a username",
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                    ),
-                  ),
+                  hintText: "Choose a username",
+                  prefixIcon: const Icon(Icons.person),
+                  enabled: state is! AuthLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter username';
@@ -54,16 +84,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: kDefaultPadding),
-                TextFormField(
+                CustomTextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    hintText: "Create password",
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                    ),
-                  ),
+                  hintText: "Create password",
+                  prefixIcon: const Icon(Icons.lock),
+                  enabled: state is! AuthLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter password';
@@ -75,16 +101,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: kDefaultPadding),
-                TextFormField(
+                CustomTextFormField(
                   controller: _confirmPasswordController,
+                  hintText: "Confirm password",
+                  prefixIcon: const Icon(Icons.lock_outline),
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    hintText: "Confirm password",
-                    prefixIcon: Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                    ),
-                  ),
+                  enabled: state is! AuthLoading,
                   validator: (value) {
                     if (value != _passwordController.text) {
                       return 'Passwords do not match';
@@ -95,15 +117,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: kDefaultPadding * 1.5),
                 PrimaryButton(
                   text: "Sign Up",
+                  isLoading: state is AuthLoading,
                   press: () {
                     if (_formKey.currentState!.validate()) {
-                      // TODO: Implement sign up logic
-                      NavigationUtil.navigateTo(
-                        context,
-                        const ChatsScreen(),
-                        transitionType: PageTransitionType.rightToLeft,
-                        clearStack: true,
-                      );
+                      ref.read(authProvider.notifier).signUp(
+                            _usernameController.text,
+                            _passwordController.text,
+                          );
                     }
                   },
                 ),

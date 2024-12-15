@@ -9,12 +9,14 @@ class PrimaryButton extends StatelessWidget {
     required this.press,
     this.color = kPrimaryColor,
     this.padding = const EdgeInsets.all(kDefaultPadding * 0.75),
+    this.isLoading = false,
   });
 
   final String text;
   final VoidCallback press;
   final Color color;
   final EdgeInsets padding;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +27,20 @@ class PrimaryButton extends StatelessWidget {
       padding: padding,
       color: color,
       minWidth: double.infinity,
-      onPressed: press,
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white),
-      ),
+      onPressed: isLoading ? null : press,
+      child: isLoading
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+          : Text(
+              text,
+              style: const TextStyle(color: Colors.white),
+            ),
     );
   }
 }
