@@ -1,39 +1,112 @@
-# Chat/Messaging App Light and Dark Theme - Flutter UI
+# Flutter Chat Application
 
-## [Watch it on YouTube](https://youtu.be/uiJF-ShOLyo)
+A modern chat application built with Flutter, featuring both light and dark themes. This project demonstrates clean architecture, state management with Riverpod, and professional API integration.
 
-## [Complete Source Code (Patreon only)](https://bit.ly/3n5mdwS)
+## Features
 
-**Packages we are using:**
+### Authentication
 
-- goole_fonts: [link](https://pub.dev/packages/google_fonts)
+- User Sign Up
+- User Sign In
+- Token-based Authentication
+- Auto Token Refresh
+- Session Management
 
-Today we gonna build messing/chat app #ui using #flutter that runs both Android and iOS devices also has a dark and light theme. We create in total 4 screens all of that support both Dark Theme and Light Theme. At first, we design a welcome screen that contains an image with a tag line also has a skip button. Once the user press, its transfers to the Sign-in or Sign-up screen. The last two screens are the main screen, Chats screens it shows the list of people you are chated with. At the end message screen which support text message, audio message, and video messages.
+### UI/UX
 
-**Complete UI Contains:**
+- Light/Dark Theme Support
+- Custom Form Components
+- Professional Animations
+- Loading States
+- Error Handling
+- Snackbar Notifications
+- Page Transitions
 
-► Splash Screen
-► Welcome Screen
-► Sign in & Sign up
-► Phone Validation (OTP)
-► Forget Password
-► Change Password
-► Chats Screen
-► Search Chats
-► Message Screen
-► Audio Call
-► Video Call
-► Contacts
-► Search Contacts
-► Call History
-► Search on Call history
-► Profile Screen
-► Edit Profile
+### Chat Features
 
-### Chat/Messaging App Light and Dark Theme Final UI
+- Real-time Messaging
+- Message Types:
+  - Text Messages
+  - Audio Messages
+  - Video Messages
+- Online Status
+- Message Status (sent, delivered, read)
+- Chat History
+- User Search
 
-![Preview](/gif.gif)
-![Preview](/ui_kit.gif)
+## Tech Stack
 
-![App UI](/ui.png)
-![App UI](/chat_kit.png)
+### State Management
+
+- flutter_riverpod: ^2.6.1
+
+### Network & Storage
+
+- http: ^1.2.2
+- shared_preferences: ^2.3.3
+
+### UI Components
+
+- google_fonts: ^6.2.1
+- flutter_svg: ^2.0.10
+- page_transition: ^2.1.0
+
+### Development Tools
+
+- logger: ^2.5.0
+- freezed: ^2.4.7
+- build_runner: ^2.4.8
+- json_serializable: ^6.7.1
+
+## Project Structure
+
+lib/
+├── components/
+│ ├── custom_text_form_field.dart
+│ ├── filled_outline_button.dart
+│ └── primary_button.dart
+├── config/
+│ └── app_config.dart
+├── models/
+│ ├── api_response.dart
+│ ├── chat.dart
+│ └── chat_message.dart
+├── providers/
+│ └── auth/
+│ ├── auth_provider.dart
+│ └── auth_state.dart
+├── screens/
+│ ├── auth/
+│ ├── chats/
+│ ├── messages/
+│ └── welcome/
+├── services/
+│ ├── http_service.dart
+│ └── storage_service.dart
+└── utils/
+└── navigation_util.dart
+
+## API Integration
+
+The app uses a RESTful API with:
+
+- Token-based authentication
+- Automatic token refresh
+- Professional error handling
+- Beautiful request/response logging
+
+## Screenshots
+
+[Add your app screenshots here]
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
