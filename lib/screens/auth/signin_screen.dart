@@ -1,25 +1,39 @@
+import 'package:chat/providers/auth/auth_provider.dart';
+import 'package:chat/screens/chats/chats_screen.dart';
 import 'package:chat/utils/navigation_util.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../components/primary_button.dart';
 import '../../constants.dart';
-import '../chats/chats_screen.dart';
 
-class SignInScreen extends StatefulWidget {
+class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  ConsumerState<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends ConsumerState<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(authProvider, (previous, next) {
+      if (next is AuthSuccess) {
+        NavigationUtil.navigateTo(
+          context,
+          const ChatsScreen(),
+          clearStack: true,
+        );
+      } else if (next is AuthError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.message)),
+        );
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sign In"),
@@ -72,13 +86,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   text: "Sign In",
                   press: () {
                     if (_formKey.currentState!.validate()) {
-                      // TODO: Implement sign in logic
-                      NavigationUtil.navigateTo(
-                        context,
-                        const ChatsScreen(),
-                        transitionType: PageTransitionType.rightToLeft,
-                        clearStack: true,
-                      );
+                      ref.read(authProvider.notifier).signIn(
+                            _usernameController.text,
+                            _passwordController.text,
+                          );
                     }
                   },
                 ),
