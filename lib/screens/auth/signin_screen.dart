@@ -1,3 +1,4 @@
+import 'package:chat/components/custom_text_form_field.dart';
 import 'package:chat/providers/auth/auth_provider.dart';
 import 'package:chat/screens/chats/chats_screen.dart';
 import 'package:chat/utils/navigation_util.dart';
@@ -34,6 +35,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         );
       }
     });
+
+    final state = ref.watch(authProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sign In"),
@@ -47,15 +51,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             child: Column(
               children: [
                 const Spacer(),
-                TextFormField(
+                CustomTextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(
-                    hintText: "Username",
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                    ),
-                  ),
+                  hintText: "Username",
+                  prefixIcon: const Icon(Icons.person),
+                  enabled: state is! AuthLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter username';
@@ -64,16 +64,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   },
                 ),
                 const SizedBox(height: kDefaultPadding),
-                TextFormField(
+                CustomTextFormField(
                   controller: _passwordController,
+                  hintText: "Password",
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    hintText: "Password",
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(40)),
-                    ),
-                  ),
+                  prefixIcon: const Icon(Icons.lock),
+                  enabled: state is! AuthLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter password';
@@ -84,6 +80,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 const SizedBox(height: kDefaultPadding * 1.5),
                 PrimaryButton(
                   text: "Sign In",
+                  isLoading: state is AuthLoading,
                   press: () {
                     if (_formKey.currentState!.validate()) {
                       ref.read(authProvider.notifier).signIn(

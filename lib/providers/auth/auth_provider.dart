@@ -1,4 +1,5 @@
 import 'package:chat/models/api_response.dart';
+import 'package:chat/models/request/auth.dart';
 import 'package:chat/services/http_service.dart';
 import 'package:chat/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier() : super(const AuthInitial());
 
   final _httpService = HttpService();
+  final _storageService = StorageService();
 
   Future<void> signUp(String username, String password) async {
     state = const AuthLoading();
@@ -17,21 +19,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final response = await _httpService.request(
         '/v1/user/signup',
         method: HttpMethod.post,
-        data: {
-          'username': username,
-          'password': password,
-        },
+        data: SignUpRequest(username: username, password: password).toJson(),
       );
 
       final apiResponse = ApiResponse<dynamic>.fromJson(
         response,
         (data) => data,
-      );
-
-      // store token in shared preferences
-      await StorageService().saveTokens(
-        accessToken: response['data']['tokens']['accessToken'],
-        refreshToken: response['data']['tokens']['refreshToken'],
       );
 
       state = AuthSuccess(apiResponse);
@@ -49,15 +42,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final response = await _httpService.request(
         '/v1/user/signin',
         method: HttpMethod.post,
-        data: {
-          'username': username,
-          'password': password,
-        },
+        data: SignInRequest(username: username, password: password).toJson(),
       );
 
       final apiResponse = ApiResponse<dynamic>.fromJson(
         response,
         (data) => data,
+      );
+
+      // store token in shared preferences
+      await _storageService.saveTokens(
+        accessToken: apiResponse.data['tokens']['accessToken'],
+        refreshToken: apiResponse.data['tokens']['refreshToken'],
       );
 
       state = AuthSuccess(apiResponse);

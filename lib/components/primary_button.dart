@@ -25,18 +25,11 @@ class PrimaryButton extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(40)),
       ),
       padding: padding,
-      color: color,
+      color: isLoading ? Colors.grey : color,
       minWidth: double.infinity,
       onPressed: isLoading ? null : press,
       child: isLoading
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
+          ? CircularProgressIndicator(color: color)
           : Text(
               text,
               style: const TextStyle(color: Colors.white),
