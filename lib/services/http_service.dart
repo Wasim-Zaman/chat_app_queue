@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
 
 import '../config/app_config.dart';
 import '../screens/auth/signin_screen.dart';
 import '../utils/navigation_util.dart';
+import 'logs_service.dart';
 import 'storage_service.dart';
 
 enum HttpMethod {
@@ -17,16 +17,6 @@ enum HttpMethod {
 }
 
 class HttpService {
-  static final _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 3,
-      lineLength: 80,
-      colors: true,
-      printEmojis: true,
-    ),
-  );
-
   // Status codes for token expiry
   static const int accessTokenExpiredCode = 401;
   static const int refreshTokenExpiredCode = 403;
@@ -34,6 +24,7 @@ class HttpService {
   final String _baseUrl;
   bool _isRefreshing = false;
   final StorageService _storage = StorageService();
+  final LogsService _logger = LogsService();
 
   HttpService({String? baseUrl}) : _baseUrl = baseUrl ?? AppConfig.baseUrl;
 
@@ -94,57 +85,6 @@ class HttpService {
     }
   }
 
-  void _logRequest(
-    String method,
-    String url,
-    Map<String, String> headers,
-    dynamic body,
-  ) {
-    final requestLog = StringBuffer();
-    requestLog.writeln('\n🌐 REQUEST DETAILS');
-    requestLog.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    requestLog.writeln('URL: $url');
-    requestLog.writeln('METHOD: $method');
-    requestLog.writeln(
-        'HEADERS: ${const JsonEncoder.withIndent('  ').convert(headers)}');
-
-    if (body != null) {
-      final bodyStr = body is String
-          ? body
-          : const JsonEncoder.withIndent('  ').convert(body);
-      requestLog.writeln('BODY: $bodyStr');
-    }
-
-    _logger.i(requestLog.toString());
-  }
-
-  void _logResponse(http.Response response, Duration duration) {
-    final responseLog = StringBuffer();
-    responseLog.writeln('\n📨 RESPONSE DETAILS [${duration.inMilliseconds}ms]');
-    responseLog.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    responseLog.writeln('STATUS: ${response.statusCode}');
-    responseLog.writeln('URL: ${response.request?.url}');
-
-    if (response.headers.isNotEmpty) {
-      responseLog.writeln(
-          'HEADERS: ${const JsonEncoder.withIndent('  ').convert(response.headers)}');
-    }
-
-    if (response.body.isNotEmpty) {
-      try {
-        final dynamic jsonData = json.decode(response.body);
-        final prettyJson = const JsonEncoder.withIndent('  ').convert(jsonData);
-        responseLog.writeln('BODY: $prettyJson');
-      } catch (e) {
-        responseLog.writeln('BODY: ${response.body}');
-      }
-    }
-
-    final icon =
-        response.statusCode >= 200 && response.statusCode < 300 ? '✅' : '❌';
-    _logger.i('$icon ${responseLog.toString()}');
-  }
-
   // Main Request Method
   Future<dynamic> request(
     String endpoint, {
@@ -160,7 +100,7 @@ class HttpService {
 
     final stopwatch = Stopwatch()..start();
 
-    _logRequest(
+    _logger.logRequest(
       method.toString().split('.').last.toUpperCase(),
       '$_baseUrl$endpoint',
       headers,
@@ -175,15 +115,15 @@ class HttpService {
     );
 
     stopwatch.stop();
-    _logResponse(response, stopwatch.elapsed);
+    _logger.logResponse(response, stopwatch.elapsed);
 
     // Handle Access Token Expiry
     if (response.statusCode == accessTokenExpiredCode) {
-      _logger.w('🔄 Token expired, attempting refresh...');
+      _logger.logWarning('🔄 Token expired, attempting refresh...');
 
       final refreshSuccess = await _refreshTokens();
       if (refreshSuccess) {
-        _logger.i('🔑 Token refresh successful, retrying request...');
+        _logger.logInfo('🔑 Token refresh successful, retrying request...');
 
         final newHeaders = await _getHeaders();
         response = await _performRequest(
@@ -193,9 +133,9 @@ class HttpService {
           body: data,
         );
 
-        _logResponse(response, stopwatch.elapsed);
+        _logger.logResponse(response, stopwatch.elapsed);
       } else if (context != null && context.mounted) {
-        _logger.e('❌ Token refresh failed');
+        _logger.logError('❌ Token refresh failed');
         _handleUnauthorized(context);
         throw Exception('Session expired. Please login again.');
       }
@@ -205,7 +145,7 @@ class HttpService {
     if (response.statusCode == refreshTokenExpiredCode &&
         context != null &&
         context.mounted) {
-      _logger.e('🚫 Refresh token expired');
+      _logger.logError('🚫 Refresh token expired');
       _handleUnauthorized(context);
       throw Exception('Session expired. Please login again.');
     }
