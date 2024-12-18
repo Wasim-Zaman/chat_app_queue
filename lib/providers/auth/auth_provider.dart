@@ -29,7 +29,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       state = AuthSuccess(apiResponse);
     } on HttpException catch (e) {
-      state = AuthError(e.message);
+      state = AuthError(e.toString());
     } catch (e) {
       state = AuthError(e.toString());
     }

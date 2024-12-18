@@ -18,8 +18,8 @@ enum HttpMethod {
 
 class HttpService {
   // Status codes for token expiry
-  static const int accessTokenExpiredCode = 401;
-  static const int refreshTokenExpiredCode = 403;
+  static const int accessTokenExpiredCode = 419;
+  static const int refreshTokenExpiredCode = 420;
 
   final String _baseUrl;
   bool _isRefreshing = false;
@@ -49,18 +49,17 @@ class HttpService {
         return false;
       }
 
-      // TODO: Replace with your refresh token endpoint
-      final response = await http.post(
-        Uri.parse('$_baseUrl/auth/refresh'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'refresh_token': refreshToken}),
+      final response = await request(
+        '/v1/user/refresh-token',
+        method: HttpMethod.post,
+        data: {'refreshToken': refreshToken},
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         await _storage.saveTokens(
-          accessToken: data['access_token'],
-          refreshToken: data['refresh_token'],
+          accessToken: data['accessToken'],
+          refreshToken: data['refreshToken'],
         );
         return true;
       }

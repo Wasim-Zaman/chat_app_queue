@@ -16,6 +16,8 @@ class LogsService {
       colors: true,
       printEmojis: true,
     ),
+    filter: DevelopmentFilter(),
+    output: ConsoleOutput(),
   );
 
   void logRequest(
