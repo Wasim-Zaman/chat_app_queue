@@ -9,28 +9,28 @@ part 'friends_state.dart';
 // TODO: 1. State Notifier
 // TODO: 2. State Notifier Provider
 
-class PeopleNotifier extends StateNotifier<PeopleState> {
-  PeopleNotifier() : super(PeopleInitial());
+class FriendsNotifier extends StateNotifier<FriendsState> {
+  FriendsNotifier() : super(FriendsInitial());
 
   final _httpService = HttpService();
 
   Future<void> searchUsers(String username) async {
     try {
-      state = PeopleLoading();
+      state = FriendsSearchLoading();
       final response =
           await _httpService.request('/v1/user/search?query=$username');
       final apiResponse = ApiResponse<List<User>>.fromJson(
         response,
-        (data) => List<User>.from(data.map((e) => User.fromJson(e))),
+        (data) => List<User>.from(data['users'].map((e) => User.fromJson(e))),
       );
-      state = PeopleSuccess(apiResponse);
+      state = FriendsSearchSuccess(apiResponse);
     } catch (e) {
-      state = PeopleError(e.toString());
+      state = FriendsSearchError(e.toString());
     }
   }
 }
 
-final peopleProvider =
-    StateNotifierProvider<PeopleNotifier, PeopleState>((ref) {
-  return PeopleNotifier();
+final friendsProvider =
+    StateNotifierProvider<FriendsNotifier, FriendsState>((ref) {
+  return FriendsNotifier();
 });
