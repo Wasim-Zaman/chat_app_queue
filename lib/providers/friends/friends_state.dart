@@ -4,18 +4,24 @@ part of 'friends_provider.dart';
 
 sealed class FriendsState {}
 
-class FriendsInitial extends FriendsState {}
+class FriendsInitial extends FriendsState {
+  final ApiResponse<List<User>>? apiResponse;
+  FriendsInitial({this.apiResponse});
+}
 
-class FriendsSearchLoading extends FriendsState {}
+class FriendsSearchLoading extends FriendsState {
+  final ApiResponse<List<User>>? apiResponse;
+  FriendsSearchLoading({this.apiResponse});
+}
 
 class FriendsSearchSuccess extends FriendsState {
-  final ApiResponse<List<User>> users;
-  FriendsSearchSuccess(this.users);
+  final ApiResponse<List<User>>? apiResponse;
+  FriendsSearchSuccess({this.apiResponse});
 }
 
 class FriendsSearchError extends FriendsState {
-  final String message;
-  FriendsSearchError(this.message);
+  final ApiResponse<List<User>>? apiResponse;
+  FriendsSearchError({this.apiResponse});
 }
 
 // Friends

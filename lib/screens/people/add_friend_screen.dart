@@ -67,7 +67,7 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          friendsState.message,
+                          friendsState.apiResponse?.message ?? '',
                           style: const TextStyle(color: Colors.red),
                           textAlign: TextAlign.center,
                         ),
@@ -77,8 +77,8 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                 }
 
                 if (friendsState is FriendsSearchSuccess) {
-                  final users = friendsState.users;
-                  if (users.data?.isEmpty ?? true) {
+                  final users = friendsState.apiResponse?.data;
+                  if (users?.isEmpty ?? true) {
                     return const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -102,9 +102,9 @@ class _AddFriendScreenState extends ConsumerState<AddFriendScreen> {
                   }
 
                   return ListView.builder(
-                    itemCount: users.data?.length ?? 0,
+                    itemCount: users?.length ?? 0,
                     itemBuilder: (context, index) {
-                      final user = users.data![index];
+                      final user = users![index];
                       return SearchUserTile(
                         user: user,
                         onSendRequest: () => _sendFriendRequest(user.id),

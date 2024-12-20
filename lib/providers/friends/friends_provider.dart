@@ -15,17 +15,18 @@ class FriendsNotifier extends StateNotifier<FriendsState> {
   final _httpService = HttpService();
 
   Future<void> searchUsers(String username) async {
+    ApiResponse<List<User>>? apiResponse;
     try {
       state = FriendsSearchLoading();
       final response =
           await _httpService.request('/v1/user/search?query=$username');
-      final apiResponse = ApiResponse<List<User>>.fromJson(
+      apiResponse = ApiResponse<List<User>>.fromJson(
         response,
         (data) => List<User>.from(data['users'].map((e) => User.fromJson(e))),
       );
-      state = FriendsSearchSuccess(apiResponse);
+      state = FriendsSearchSuccess(apiResponse: apiResponse);
     } catch (e) {
-      state = FriendsSearchError(e.toString());
+      state = FriendsSearchError(apiResponse: apiResponse);
     }
   }
 }
