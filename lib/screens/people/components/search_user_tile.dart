@@ -44,7 +44,7 @@ class SearchUserTile extends StatelessWidget {
               user.avatar != null ? NetworkImage(user.avatar!) : null,
           child: user.avatar == null
               ? Text(
-                  user.username[0].toUpperCase(),
+                  "${user.username[0].toUpperCase()}${user.username[user.username.length - 1].toUpperCase()}",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,

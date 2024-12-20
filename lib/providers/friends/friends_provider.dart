@@ -29,6 +29,15 @@ class FriendsNotifier extends StateNotifier<FriendsState> {
       state = FriendsSearchError(apiResponse: apiResponse);
     }
   }
+
+  Future<void> sendFriendRequest(String userId) async {
+    ApiResponse<List<User>>? apiResponse;
+    try {
+      state = FriendsSearchLoading();
+    } catch (e) {
+      state = FriendsSearchError(apiResponse: apiResponse);
+    }
+  }
 }
 
 final friendsProvider =

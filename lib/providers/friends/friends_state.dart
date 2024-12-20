@@ -24,4 +24,12 @@ class FriendsSearchError extends FriendsState {
   FriendsSearchError({this.apiResponse});
 }
 
-// Friends
+// * Request
+
+class RequestInitial extends FriendsState {}
+
+class RequestLoading extends FriendsState {}
+
+class RequestSuccess extends FriendsState {}
+
+class RequestError extends FriendsState {}
