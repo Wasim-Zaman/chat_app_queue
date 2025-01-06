@@ -4,6 +4,8 @@ import 'package:chat/services/http_service.dart';
 import 'package:chat/services/storage_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../models/user.dart';
+
 part 'auth_state.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
@@ -55,6 +57,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         accessToken: apiResponse.data['tokens']['accessToken'],
         refreshToken: apiResponse.data['tokens']['refreshToken'],
       );
+
+      // store user in shared preferences
+      await _storageService.saveUser(User.fromJson(apiResponse.data['user']));
 
       state = AuthSuccess(apiResponse);
     } on HttpException catch (e) {

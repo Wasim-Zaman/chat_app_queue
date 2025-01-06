@@ -58,8 +58,8 @@ class HttpService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         await _storage.saveTokens(
-          accessToken: data['accessToken'],
-          refreshToken: data['refreshToken'],
+          accessToken: data['data']['accessToken'],
+          refreshToken: data['data']['refreshToken'],
         );
         return true;
       }

@@ -33,6 +33,16 @@ class User {
     );
   }
 
+  factory User.empty() {
+    return User(
+      id: '',
+      username: '',
+      avatar: null,
+      isOnline: false,
+      friendshipStatus: FriendshipStatus.none,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

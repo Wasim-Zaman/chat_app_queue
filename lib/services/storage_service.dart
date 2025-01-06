@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/user.dart';
 
 class StorageService {
   static const String _accessTokenKey = 'access_token';
@@ -33,6 +37,24 @@ class StorageService {
   Future<String?> getRefreshToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_refreshTokenKey);
+  }
+
+  // User Storage Methods
+  Future<void> saveUser(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user', jsonEncode(user.toJson()));
+  }
+
+  Future<User?> getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user');
+    if (userJson == null) return null;
+    return User.fromJson(jsonDecode(userJson));
+  }
+
+  Future<void> clearUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user');
   }
 
   // Generic methods for other storage needs
